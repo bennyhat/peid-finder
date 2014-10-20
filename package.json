@@ -1,4 +1,58 @@
 {
     "name": "peid-finder",
-    "version": "0.0.1"
+    "version": "0.0.1",
+    "description": "extracts a portable executable entry point string from an executable",
+    "keywords": [
+        "peid",
+        "silent",
+        "flag",
+        "install"
+    ],
+    "author": {
+        "name": "Ben Brewer",
+        "email": "ben@benbrewer.me"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/bennyhat/peid-finder.git"
+    },
+    "os": [ "win32" ],
+    "main": "./index",
+    "bin": {
+        "objdump-x86": "./bin/objdump-x86.exe",
+        "objdump-x64": "./bin/objdump-x64.exe"
+    },
+    "engines": {
+        "node": ">= 0.10.x"
+    },
+    "scripts": {
+        "install": "node unpack.js",
+        "test": "mocha"
+    },
+    "dependencies": {
+        "async": "0.9.0",
+        "globule": "0.2.0"
+    },
+    "devDependencies": {
+        "mocha": ">= 1.21.5",
+        "should": ">= 4.1.0"
+    },
+    "files": [
+        "bin",
+        "index.js",
+        "unpack.js",
+        "LICENSE"
+    ],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://raw.githubusercontent.com/bennyhat/peid-finder/master/LICENSE"
+        }
+    ],
+    "readmeFilename": "Readme.md",
+    "bugs": {
+        "url": "https://github.com/bennyhat/peid-finder/issues"
+    },
+    "homepage": "https://github.com/bennyhat/peid-finder",
+    "_id": "peid-finder@0.0.1"
 }
