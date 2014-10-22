@@ -12,9 +12,9 @@ var sObjectDumpPath = lPath.resolve(lPath.join(__dirname, "bin", "objdump-" + lO
 module.exports = {
     find: function find(sBinaryPath, iLength, fCallback) {
         // basic validation
-        if (typeof sBinaryPath !== "string") { return fCallback(new Error ("please pass in string for the binary path(s)"));}
-        if (typeof iLength !== "number") { return fCallback(new Error ("please pass in number for the PEID character count"));}
-        if (iLength > 32) { return fCallback(new Error ("cannot return more than 30 PEID characters"));}
+        if (typeof sBinaryPath !== "string") { return fCallback(new Error("please pass in string for the binary path(s)"));}
+        if (typeof iLength !== "number") { return fCallback(new Error("please pass in number for the PEID character count"));}
+        if (iLength > 32) { return fCallback(new Error("cannot return more than 30 PEID characters"));}
 
         // kick it off async
         process.nextTick(function () {
@@ -29,7 +29,7 @@ module.exports = {
             if (asBinaryPaths.length < 1) { return fCallback(new Error("No such files found"));}
 
             // tracking for the characters that were found
-            var asEntryCharacters = [];
+            var oEntryMappings = {};
 
             // this gets a bit janky, due to the callback structure for waterfall
             lAsync.forEach(asBinaryPaths, function (sBinaryPath) {
@@ -43,9 +43,10 @@ module.exports = {
                     ],
                     function (eError, sEntryCharacters) {
                         if (eError) { return fCallback(eError); }
-                        asEntryCharacters.push(sEntryCharacters);
+                        var sBinaryName = lPath.basename(sBinaryPath);
+                        oEntryMappings[sBinaryName] = sEntryCharacters;
                         // TODO - find a less silly way of doing this
-                        if (asEntryCharacters.length === asBinaryPaths.length) { fCallback(null, asEntryCharacters); }
+                        if (Object.keys(oEntryMappings).length === asBinaryPaths.length) { fCallback(null, oEntryMappings); }
                     });
             });
 
@@ -85,7 +86,7 @@ function getEntryPointCharacters(sBinaryPath, iStartAddress, iLength, fCallback)
             "--start-address=" + iStartAddress,
             "--stop-address=" + iStopAddress,
         "--show-raw-insn",
-        "--insn-width=" + iLength,
+            "--insn-width=" + iLength,
         sBinaryPath
     ];
 
@@ -94,7 +95,7 @@ function getEntryPointCharacters(sBinaryPath, iStartAddress, iLength, fCallback)
 
         var aMatches = rexCharacters.exec(sStandardOut);
         if (!aMatches) { return fCallback(new Error("unable to find the entry characters in the binary")); }
-        var sEntryCharacters = aMatches[1].replace(RegExp("[^0-9a-z]+","gi"), "").trim();
+        var sEntryCharacters = aMatches[1].replace(RegExp("[^0-9a-z]+", "gi"), "").trim();
 
         fCallback(null, sEntryCharacters);
     });
