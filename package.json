@@ -19,8 +19,9 @@
     "os": [ "win32" ],
     "main": "./index",
     "bin": {
-        "objdump-x86": "./bin/objdump-x86.exe",
-        "objdump-x64": "./bin/objdump-x64.exe"
+        "peid-finder": "bin/peid-finder",
+        "objdump-x86": "bin/objdump-x86.exe",
+        "objdump-x64": "bin/objdump-x64.exe"
     },
     "engines": {
         "node": ">= 0.10.x"

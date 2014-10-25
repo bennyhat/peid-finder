@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+process.title = "peid-finder";
+
+var peidFinder = require(__dirname + "/../index.js");
+
+var sExecutablePath = process.argv[2];
+var iLength = parseInt(process.argv[3]) || 8;
+
+if (!sExecutablePath) { throw new Error("you must provide a path or glob to the executables you'd like to find PEIDs for"); }
+
+peidFinder.find(sExecutablePath, iLength, function (eError, aPEIDs) {
+    if (eError) { throw eError; }
+    console.log(JSON.stringify(aPEIDs, null, 4));
+});
+
