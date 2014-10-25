@@ -1,12 +1,12 @@
-var lChildProcess = require('child_process');
-var lPath = require("path");
-var lOperatingSystem = require("os");
-var lGlobule = require("globule");
-var lAsync = require("async");
+var child = require('child_process');
+var path = require("path");
+var os = require("os");
+var globule = require("globule");
+var async = require("async");
 
 // quick fix-up for operating system detection
-if (lOperatingSystem.platform() !== "win32") { throw new Error("objdump currently only works for windows");}
-var sObjectDumpPath = lPath.resolve(lPath.join(__dirname, "bin", "objdump-" + lOperatingSystem.arch() + ".exe"));
+if (os.platform() !== "win32") { throw new Error("peid-finder currently only works for windows");}
+var sObjectDumpPath = path.resolve(path.join(__dirname, "bin", "objdump-" + os.arch() + ".exe"));
 
 // export of the main find function
 module.exports = {
@@ -24,16 +24,16 @@ module.exports = {
                 asBinaryPaths = [sBinaryPath];
             }
             else {
-                asBinaryPaths = lGlobule.find(sBinaryPath);
+                asBinaryPaths = globule.find(sBinaryPath);
             }
             if (asBinaryPaths.length < 1) { return fCallback(new Error("No such files found"));}
 
             // tracking for the characters that were found
-            var oEntryMappings = {};
+            var aEntryMapping = [];
 
             // this gets a bit janky, due to the callback structure for waterfall
-            lAsync.forEach(asBinaryPaths, function (sBinaryPath) {
-                return lAsync.waterfall([
+            async.forEach(asBinaryPaths, function (sBinaryPath) {
+                return async.waterfall([
                         function (fCallback) {
                             getEntryPoint(sBinaryPath, fCallback);
                         },
@@ -43,10 +43,13 @@ module.exports = {
                     ],
                     function (eError, sEntryCharacters) {
                         if (eError) { return fCallback(eError); }
-                        var sBinaryName = lPath.basename(sBinaryPath);
-                        oEntryMappings[sBinaryName] = sEntryCharacters;
+                        var oSoftware = {};
+                        oSoftware.executable = path.basename(sBinaryPath);
+                        oSoftware.peid = sEntryCharacters;
+                        aEntryMapping.push(oSoftware);
+
                         // TODO - find a less silly way of doing this
-                        if (Object.keys(oEntryMappings).length === asBinaryPaths.length) { fCallback(null, oEntryMappings); }
+                        if (aEntryMapping.length === asBinaryPaths.length) { fCallback(null, aEntryMapping); }
                     });
             });
 
@@ -56,13 +59,13 @@ module.exports = {
 
 function getEntryPoint(sBinaryPath, fCallback) {
     // regex hell for finding the address in the output of objdump
-    var rexPointer = RegExp("start address ([\\w]+)[\\s]", "gi");
+    var rexPointer = new RegExp("start address ([\\w]+)[\\s]", "gi");
 
     var asArguments = [
         "-f",
         sBinaryPath
     ];
-    lChildProcess.execFile(sObjectDumpPath, asArguments, function (eError, sStandardOut, sStandardError) {
+    child.execFile(sObjectDumpPath, asArguments, function (eError, sStandardOut, sStandardError) {
         if (eError) {return fCallback(new Error(eError + ": " + sStandardError)); }
 
         var aMatches = rexPointer.exec(sStandardOut);
@@ -79,7 +82,7 @@ function getEntryPointCharacters(sBinaryPath, iStartAddress, iLength, fCallback)
     var sStartAddress = iStartAddress.toString(16).slice(-6);
     // the output is in the form  <last 6 of address> <group of characters we want><possible spaces><group of characters we want><possibly more groups and spaces><junk>
     // ex.  4191c6 e8e9 1a00                            ....
-    var rexCharacters = RegExp(sStartAddress + "[\\s]((?:[\\w]+[\\s]?)+)", "i"); // grab the multiple digits in the middle
+    var rexCharacters = new RegExp(sStartAddress + "[\\s]((?:[\\w]+[\\s]?)+)", "i"); // grab the multiple digits in the middle
 
     var asArguments = [
         "-s",
@@ -90,12 +93,12 @@ function getEntryPointCharacters(sBinaryPath, iStartAddress, iLength, fCallback)
         sBinaryPath
     ];
 
-    lChildProcess.execFile(sObjectDumpPath, asArguments, function (eError, sStandardOut, sStandardError) {
+    child.execFile(sObjectDumpPath, asArguments, function (eError, sStandardOut, sStandardError) {
         if (eError) {return fCallback(new Error(eError + ": " + sStandardError)); }
 
         var aMatches = rexCharacters.exec(sStandardOut);
         if (!aMatches) { return fCallback(new Error("unable to find the entry characters in the binary")); }
-        var sEntryCharacters = aMatches[1].replace(RegExp("[^0-9a-z]+", "gi"), "").trim();
+        var sEntryCharacters = aMatches[1].replace(new RegExp("[^0-9a-z]+", "gi"), "").trim();
 
         fCallback(null, sEntryCharacters);
     });
