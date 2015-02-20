@@ -3,6 +3,11 @@ peid-finder
 
 Will find extract a portable executable entrypoint string (up to 32 characters) from an executable for the purpose of identifying it.
 
+```
+NOTE: an issue with arch misidentification has been fixed for 32 bit node on 64 bit windows. 
+also 32 bit detection has been fixed in general
+```
+
 This can be used as a NodeJS module
 ```javascript
 var peid-finder = require("peid-finder");
