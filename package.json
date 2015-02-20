@@ -1,6 +1,6 @@
 {
     "name": "peid-finder",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "extracts a portable executable entry point string from an executable",
     "keywords": [
         "peid",
