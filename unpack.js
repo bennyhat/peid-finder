@@ -3,7 +3,8 @@ var lChildProcess = require('child_process');
 var lPath = require("path");
 var lOperatingSystem = require("os");
 var sUPXPath = lPath.resolve(lPath.join(__dirname, "bin", "upx.exe"));
-var sObjectDumpPath = lPath.resolve(lPath.join(__dirname, "bin", "objdump-" + lOperatingSystem.arch() + ".exe"));
+var sArchitecture = process.env.hasOwnProperty("ProgramFiles(x86)") ? "x64" : "x86";
+var sObjectDumpPath = lPath.resolve(lPath.join(__dirname, "bin", "objdump-" + sArchitecture + ".exe"));
 
 var sUnpackingArguments = [
     "-d",

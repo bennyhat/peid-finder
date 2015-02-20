@@ -6,7 +6,8 @@ var async = require("async");
 
 // quick fix-up for operating system detection
 if (os.platform() !== "win32") { throw new Error("peid-finder currently only works for windows");}
-var sObjectDumpPath = path.resolve(path.join(__dirname, "bin", "objdump-" + os.arch() + ".exe"));
+var sArchitecture = process.env.hasOwnProperty("ProgramFiles(x86)") ? "x64" : "x86";
+var sObjectDumpPath = path.resolve(path.join(__dirname, "bin", "objdump-" + sArchitecture + ".exe"));
 
 // export of the main find function
 module.exports = {
