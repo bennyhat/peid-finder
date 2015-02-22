@@ -10,8 +10,8 @@ also 32 bit detection has been fixed in general
 
 This can be used as a NodeJS module
 ```javascript
-var peid-finder = require("peid-finder");
-var peid-finder.find("**/*.exe",8,function (error, peids) {
+var peidFinder = require("peid-finder");
+var peidFinder.find("**/*.exe",8,function (error, peids) {
 });
 ```
 
