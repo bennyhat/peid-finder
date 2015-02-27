@@ -5,7 +5,8 @@ Will find extract a portable executable entrypoint string (up to 32 characters) 
 
 ```
 NOTE: an issue with arch misidentification has been fixed for 32 bit node on 64 bit windows. 
-also 32 bit detection has been fixed in general
+also 32 bit detection has been fixed in general.
+Also, at some point I will get this moved over to a node-gyp based install that strips out some of the unnessary objdump stuff and (MAYBE?!) helps with running this cross-platform.
 ```
 
 This can be used as a NodeJS module
